@@ -69,6 +69,13 @@ const Navbar: React.FC<NavbarProps> = ({
               >
                 Perfumes
               </Link>
+              {/* ✅ Privacy Policy Link */}
+              <Link
+                to="/privacy-policy"
+                className="text-gray-700 hover:text-orange-600 transition-colors font-medium"
+              >
+                Privacy Policy
+              </Link>
             </div>
 
             <div className="flex items-center space-x-4">
