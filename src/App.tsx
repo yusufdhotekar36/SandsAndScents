@@ -12,6 +12,8 @@ import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
 import FloatingElements from './components/FloatingElements';
 import PrivacyPolicy from './pages/PrivacyPolicy'; // ✅ Added this line
+import Footer from './components/Footer';
+
 
 interface CartItem {
   id: string;
@@ -97,7 +99,7 @@ function App() {
             cartItems={cartItems}
             onOrderComplete={handleOrderComplete}
           />
-          
+          <Footer />  {/* ✅ This will add Privacy Policy link at the bottom */}
           <Toaster 
             position="top-right"
             toastOptions={{
