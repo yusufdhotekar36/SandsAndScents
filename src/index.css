@@ -1,0 +1,84 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #f9fafb;
+    min-height: 100vh;
+  }
+}
+
+@layer components {
+  .glass-effect {
+    @apply backdrop-blur-md bg-white/20 border border-white/30;
+  }
+  
+  .sand-particle {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: #d97706;
+    border-radius: 50%;
+    opacity: 0.6;
+    animation: sand-drift 20s linear infinite;
+  }
+  
+  .perfume-bottle {
+    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.1));
+    transition: all 0.3s ease;
+  }
+  
+  .perfume-bottle:hover {
+    transform: translateY(-10px) scale(1.05);
+    filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.2));
+  }
+
+  .line-clamp-1 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+  }
+
+  .line-clamp-2 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+}
+
+.floating-elements {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.floating-element {
+  position: absolute;
+  opacity: 0.1;
+  animation: float 6s ease-in-out infinite;
+}
+
+.floating-element:nth-child(1) { top: 10%; left: 10%; animation-delay: 0s; }
+.floating-element:nth-child(2) { top: 20%; right: 10%; animation-delay: 1s; }
+.floating-element:nth-child(3) { bottom: 20%; left: 20%; animation-delay: 2s; }
+.floating-element:nth-child(4) { bottom: 10%; right: 20%; animation-delay: 3s; }
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+
+@keyframes sand-drift {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100vw); }
+}
