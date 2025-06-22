@@ -11,6 +11,7 @@ import Products from './pages/Products';
 import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
 import FloatingElements from './components/FloatingElements';
+import PrivacyPolicy from './pages/PrivacyPolicy'; // ✅ Added this line
 
 interface CartItem {
   id: string;
@@ -82,14 +83,11 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route 
               path="/products" 
-              element={
-                <Products 
-                  onAddToCart={addToCart}
-                />
-              } 
+              element={<Products onAddToCart={addToCart} />} 
             />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} /> {/* ✅ New route */}
           </Routes>
           <FloatingWhatsAppQR />
           
