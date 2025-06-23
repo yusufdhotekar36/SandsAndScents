@@ -135,7 +135,7 @@ const LogoSidePanel = () => {
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center"
-                        onClick={() => window.open('https://chat.whatsapp.com/your-community-link', '_blank')}
+                        onClick={() => window.open('https://chat.whatsapp.com/JbmJWWnLTpgL7ejtBoy4Qs', '_blank')}
                       >
                         <MessageCircle className="h-4 w-4 mr-2" />
                         Join WhatsApp Community
