@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { ShoppingCart, Star } from 'lucide-react';
 import { useNotification } from '../contexts/NotificationContext';
+import { useNavigate } from 'react-router-dom';
 
 interface PerfumeCardProps {
   perfume: {
@@ -13,17 +14,22 @@ interface PerfumeCardProps {
     category: string;
     stock: number;
   };
-  onClick: () => void;
+  onClick?: () => void;
   onAddToCart: (perfume: any, quantity: number) => void;
 }
 
 const PerfumeCard: React.FC<PerfumeCardProps> = ({ perfume, onClick, onAddToCart }) => {
   const { showNotification } = useNotification();
+  const navigate = useNavigate();
 
   const handleQuickAdd = (e: React.MouseEvent) => {
     e.stopPropagation();
     onAddToCart(perfume, 1);
     showNotification('success', 'Added to Cart', `${perfume.name} has been added to your cart!`);
+  };
+
+  const handleCardClick = () => {
+    navigate(`/perfume/${perfume.id}`);
   };
 
   return (
@@ -32,7 +38,7 @@ const PerfumeCard: React.FC<PerfumeCardProps> = ({ perfume, onClick, onAddToCart
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -5 }}
       className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer border border-gray-200"
-      onClick={onClick}
+      onClick={handleCardClick}
     >
       <div className="relative overflow-hidden">
         <img

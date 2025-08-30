@@ -8,6 +8,7 @@ import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import DataDeletionPolicy from './pages/DataDeletionPolicy';
+import PerfumeDetailPage from './pages/PerfumeDetailPage';
 
 import MainLayout from './MainLayout';
 import ErrorPage from './components/ErrorPage.tsx';
@@ -59,6 +60,10 @@ export const router = ({
         {
           path: '/data-deletion-policy',
           element: <DataDeletionPolicy />
+        },
+        {
+          path: '/perfume/:id',
+          element: <PerfumeDetailPage onAddToCart={onAddToCart} />
         }
       ]
     },

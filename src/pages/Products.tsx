@@ -132,7 +132,7 @@ const Products: React.FC<ProductsProps> = ({ onAddToCart }) => {
                   placeholder="Search perfumes..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-600"
                 />
               </div>
               <div className="flex items-center space-x-2">
@@ -140,7 +140,7 @@ const Products: React.FC<ProductsProps> = ({ onAddToCart }) => {
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-600"
                 >
                   {categories.map(category => (
                     <option key={category} value={category}>

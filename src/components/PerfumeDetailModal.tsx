@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Plus, Minus, ShoppingCart, Star, Heart } from 'lucide-react';
 import { useNotification } from '../contexts/NotificationContext';
+import { supabase } from '../lib/supabase';
 
 interface Perfume {
   id: string;
@@ -32,25 +33,35 @@ const PerfumeDetailModal: React.FC<PerfumeDetailModalProps> = ({
 }) => {
   const { showNotification } = useNotification();
   const [quantity, setQuantity] = useState(1);
-  const [selectedSize, setSelectedSize] = useState('50ml');
+  const [selectedSize, setSelectedSize] = useState('100ml');
   const [mainImage, setMainImage] = useState('');
   const [isZoomOpen, setIsZoomOpen] = useState(false);
+  const [recommendations, setRecommendations] = useState<any[]>([]);
 
   useEffect(() => {
     if (perfume) {
       setMainImage(perfume.image_url || '');
       setQuantity(1); // Reset quantity when perfume changes
+      // Fetch recommendations
+      fetchRecommendations();
     }
   }, [perfume]);
 
+  const fetchRecommendations = async () => {
+    if (!perfume) return;
+    // Fetch 10 perfumes from the same category, excluding the current one
+    const { data, error } = await supabase
+      .from('perfumes')
+      .select('*')
+      .eq('category', perfume.category)
+      .neq('id', perfume.id)
+      .limit(10);
+    if (!error && data) setRecommendations(data);
+  };
+
   if (!isOpen || !perfume) return null;
 
-  const sizes = ['30ml', '50ml', '100ml'];
-  const reviews = [
-    { name: 'Ahmed K.', rating: 5, comment: 'Amazing fragrance, long-lasting!' },
-    { name: 'Sarah M.', rating: 5, comment: 'Perfect for special occasions.' },
-    { name: 'Omar R.', rating: 4, comment: 'Great quality, will buy again.' }
-  ];
+  const sizes = ['100ml'];
 
   const images = [
     perfume.image_url,
@@ -74,6 +85,20 @@ const PerfumeDetailModal: React.FC<PerfumeDetailModalProps> = ({
     showNotification('success', 'Added to Cart', 'Added to cart! Proceed to checkout.');
     onClose();
   };
+
+  // Listen for openPerfumeDetail event to open a new perfume in the modal
+  useEffect(() => {
+    const handler = (e: any) => {
+      if (e.detail) {
+        setQuantity(1);
+        setSelectedSize('100ml');
+        setMainImage(e.detail.image_url || '');
+        if (typeof onAddToCart === 'function') onAddToCart(e.detail, 0);
+      }
+    };
+    window.addEventListener('openPerfumeDetail', handler);
+    return () => window.removeEventListener('openPerfumeDetail', handler);
+  }, [onAddToCart]);
 
   return (
     <AnimatePresence>
@@ -193,7 +218,7 @@ const PerfumeDetailModal: React.FC<PerfumeDetailModalProps> = ({
                     whileTap={{ scale: 0.98 }}
                     onClick={handleBuyNow}
                     disabled={perfume.stock === 0}
-                    className="btn-primary w-full bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600 transition-colors disabled:opacity-50"
+                    className="btn-primary w-full disabled:opacity-50"
                   >
                     {perfume.stock === 0 ? 'Out of Stock' : 'Buy Now'}
                   </motion.button>
@@ -203,7 +228,7 @@ const PerfumeDetailModal: React.FC<PerfumeDetailModalProps> = ({
                     whileTap={{ scale: 0.98 }}
                     onClick={handleAddToCart}
                     disabled={perfume.stock === 0}
-                    className="btn-primary w-full bg-yellow-400 text-gray-900 py-3 rounded-lg font-semibold hover:bg-yellow-500 transition-colors flex items-center justify-center space-x-2 disabled:opacity-50"
+                    className="btn-primary w-full flex items-center justify-center space-x-2 disabled:opacity-50"
                   >
                     <ShoppingCart className="h-5 w-5" />
                     <span>{perfume.stock === 0 ? 'Out of Stock' : 'Add to Cart'}</span>
@@ -221,25 +246,35 @@ const PerfumeDetailModal: React.FC<PerfumeDetailModalProps> = ({
                   <p className="text-gray-700 leading-relaxed">{perfume.description}</p>
                 </div>
 
-                {/* Reviews */}
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-3">Customer Reviews</h3>
-                  <div className="space-y-3">
-                    {reviews.map((review) => (
-                      <div key={review.name} className="border-b border-gray-200 pb-3">
-                        <div className="flex items-center space-x-2 mb-1">
-                          <span className="font-medium text-gray-900">{review.name}</span>
-                          <div className="flex">
-                            {[...Array(review.rating)].map((_, i) => (
-                              <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                            ))}
-                          </div>
-                        </div>
-                        <p className="text-gray-700 text-sm">{review.comment}</p>
-                      </div>
-                    ))}
+                {/* You May Also Like */}
+                {recommendations.length > 0 && (
+                  <div className="mt-8">
+                    <h3 className="font-semibold text-gray-900 mb-3">You May Also Like</h3>
+                    <div className="flex gap-4 overflow-x-auto pb-2" role="list" aria-label="Recommended perfumes">
+                      {recommendations.map((rec) => (
+                        <button
+                          key={rec.id}
+                          className="min-w-[160px] bg-white rounded-xl shadow p-3 cursor-pointer hover:shadow-lg transition-all border border-gray-100 focus:outline-none focus:ring-2 focus:ring-slate-600"
+                          onClick={() => {
+                            setQuantity(1);
+                            setSelectedSize('100ml');
+                            setMainImage(rec.image_url || '');
+                            if (typeof onClose === 'function') onClose();
+                            setTimeout(() => {
+                              window.dispatchEvent(new CustomEvent('openPerfumeDetail', { detail: rec }));
+                            }, 100);
+                          }}
+                          tabIndex={0}
+                          aria-label={`View details for ${rec.name}`}
+                        >
+                          <img src={rec.image_url} alt={rec.name} className="w-full h-28 object-cover rounded mb-2" />
+                          <div className="font-medium text-gray-900 truncate">{rec.name}</div>
+                          <div className="text-sm text-gray-600">₹{rec.price}</div>
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
 

@@ -151,7 +151,7 @@ const DataDeletionPolicy = () => {
               </p>
               <a 
                 href="mailto:support@sandsandscents.com"
-                className="inline-flex items-center bg-orange-500 text-white px-6 py-3 rounded-lg hover:bg-orange-600 transition-colors font-medium"
+                className="btn-primary inline-flex items-center px-6 py-3 font-medium"
               >
                 <Mail className="h-4 w-4 mr-2" />
                 Contact Support

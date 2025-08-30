@@ -82,7 +82,7 @@ const Home: React.FC<HomeProps> = ({ onAddToCart }) => {
               className="w-full pl-12 py-3 bg-white/90 border border-gray-200 rounded-full shadow-sm hover:shadow-md transition-all text-gray-700 text-base sm:text-lg focus:outline-none"
               aria-label="Search perfumes"
             />
-            <Search className="h-5 w-5 text-orange-500 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
+                            <Search className="h-5 w-5 text-slate-500 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
             {/* Recommendations Dropdown */}
             {(searchFocused && searchQuery.length > 0) && (
               <div className="absolute left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-20 max-h-64 overflow-y-auto">
@@ -92,7 +92,7 @@ const Home: React.FC<HomeProps> = ({ onAddToCart }) => {
                       key={perfume.id}
                       type="button"
                       onMouseDown={() => handlePerfumeClick(perfume)}
-                      className="flex items-center w-full px-3 py-2 hover:bg-orange-50 transition-colors text-left gap-3"
+                      className="flex items-center w-full px-3 py-2 hover:bg-slate-50 transition-colors text-left gap-3"
                     >
                       <img src={perfume.image_url} alt={perfume.name} className="w-10 h-10 object-cover rounded" />
                       <span className="font-medium text-gray-800 line-clamp-1">{perfume.name}</span>
@@ -121,7 +121,7 @@ const Home: React.FC<HomeProps> = ({ onAddToCart }) => {
               <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold text-gray-900 mb-4 leading-tight">
                 SANDS AND SCENTS
               </h1>
-              <div className="text-orange-600 text-lg sm:text-xl mb-6">PERFUME RESELLER</div>
+                              <div className="text-slate-600 text-lg sm:text-xl mb-6">PERFUME RESELLER</div>
 
               <p className="text-base sm:text-lg md:text-xl text-gray-700 mb-8 max-w-3xl mx-auto">
                 Discover the mystique of the Arabian desert through our exquisite collection
@@ -214,7 +214,7 @@ const Home: React.FC<HomeProps> = ({ onAddToCart }) => {
                   transition={{ duration: 0.8, delay: index * 0.2 }}
                   className="bg-white p-6 rounded-2xl text-center hover:shadow-lg transition-all border border-gray-100"
                 >
-                  <div className="text-orange-500 mb-4 flex justify-center">
+                  <div className="text-slate-500 mb-4 flex justify-center">
                     {feature.icon}
                   </div>
                   <h3 className="text-lg font-bold text-gray-900 mb-2">{feature.title}</h3>
@@ -244,7 +244,7 @@ const Home: React.FC<HomeProps> = ({ onAddToCart }) => {
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="bg-orange-500 text-white px-8 py-4 rounded-full text-base sm:text-lg font-medium hover:bg-orange-600 hover:shadow-xl transition-all"
+                  className="btn-primary px-8 py-4 rounded-full text-base sm:text-lg font-medium hover:shadow-xl"
                 >
                   Shop Now
                 </motion.button>

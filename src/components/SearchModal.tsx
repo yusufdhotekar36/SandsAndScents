@@ -87,7 +87,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, perfumes, on
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search for perfumes, brands..."
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-600 focus:border-transparent transition-all"
                     autoFocus
                   />
                   {/* Recommendations Dropdown */}
@@ -122,7 +122,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, perfumes, on
                     <select
                       value={selectedCategory}
                       onChange={(e) => setSelectedCategory(e.target.value)}
-                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all appearance-none bg-white"
+                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-600 focus:border-transparent transition-all appearance-none bg-white"
                     >
                       {categories.map((category) => (
                         <option key={category.id} value={category.id}>

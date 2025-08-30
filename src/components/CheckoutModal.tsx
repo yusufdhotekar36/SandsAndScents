@@ -127,16 +127,16 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
                     <label className="text-sm font-medium text-gray-700 mb-1">
                       Full Name *
                     </label>
-                    <input
-                      type="text"
-                      name="fullName"
-                      value={customerDetails.fullName}
-                      onChange={handleChange}
-                      className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 ${
-                        errors.fullName ? 'border-red-500' : 'border-gray-300'
-                      }`}
-                      placeholder="Enter your full name"
-                    />
+                                          <input
+                        type="text"
+                        name="fullName"
+                        value={customerDetails.fullName}
+                        onChange={handleChange}
+                        className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-600 ${
+                          errors.fullName ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                        placeholder="Enter your full name"
+                      />
                     {errors.fullName && <p className="text-red-500 text-sm mt-1">{errors.fullName}</p>}
                   </div>
 
@@ -145,16 +145,16 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
                       <label className="text-sm font-medium text-gray-700 mb-1">
                         Phone Number *
                       </label>
-                      <input
-                        type="tel"
-                        name="phone"
-                        value={customerDetails.phone}
-                        onChange={handleChange}
-                        className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 ${
-                          errors.phone ? 'border-red-500' : 'border-gray-300'
-                        }`}
-                        placeholder="10-digit mobile number"
-                      />
+                                              <input
+                          type="tel"
+                          name="phone"
+                          value={customerDetails.phone}
+                          onChange={handleChange}
+                          className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-600 ${
+                            errors.phone ? 'border-red-500' : 'border-gray-300'
+                          }`}
+                          placeholder="10-digit mobile number"
+                        />
                       {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
                     </div>
 
@@ -162,16 +162,16 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
                       <label className="text-sm font-medium text-gray-700 mb-1">
                         Email Address *
                       </label>
-                      <input
-                        type="email"
-                        name="email"
-                        value={customerDetails.email}
-                        onChange={handleChange}
-                        className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 ${
-                          errors.email ? 'border-red-500' : 'border-gray-300'
-                        }`}
-                        placeholder="your@email.com"
-                      />
+                                              <input
+                          type="email"
+                          name="email"
+                          value={customerDetails.email}
+                          onChange={handleChange}
+                          className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-600 ${
+                            errors.email ? 'border-red-500' : 'border-gray-300'
+                          }`}
+                          placeholder="your@email.com"
+                        />
                       {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
                     </div>
                   </div>
@@ -186,7 +186,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
                       name="address"
                       value={customerDetails.address}
                       onChange={handleChange}
-                      className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 ${
+                      className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-600 ${
                         errors.address ? 'border-red-500' : 'border-gray-300'
                       }`}
                       placeholder="House no, Street, Area"
@@ -199,16 +199,16 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
                       <label className="text-sm font-medium text-gray-700 mb-1">
                         City *
                       </label>
-                      <input
-                        type="text"
-                        name="city"
-                        value={customerDetails.city}
-                        onChange={handleChange}
-                        className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 ${
-                          errors.city ? 'border-red-500' : 'border-gray-300'
-                        }`}
-                        placeholder="City"
-                      />
+                                              <input
+                          type="text"
+                          name="city"
+                          value={customerDetails.city}
+                          onChange={handleChange}
+                          className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-600 ${
+                            errors.city ? 'border-red-500' : 'border-gray-300'
+                          }`}
+                          placeholder="City"
+                        />
                       {errors.city && <p className="text-red-500 text-sm mt-1">{errors.city}</p>}
                     </div>
 
@@ -216,14 +216,14 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
                       <label className="text-sm font-medium text-gray-700 mb-1">
                         State *
                       </label>
-                      <select
-                        name="state"
-                        value={customerDetails.state}
-                        onChange={handleChange}
-                        className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 ${
-                          errors.state ? 'border-red-500' : 'border-gray-300'
-                        }`}
-                      >
+                                              <select
+                          name="state"
+                          value={customerDetails.state}
+                          onChange={handleChange}
+                          className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-600 ${
+                            errors.state ? 'border-red-500' : 'border-gray-300'
+                          }`}
+                        >
                         <option value="">Select State</option>
                         {indianStates.map(state => (
                           <option key={state} value={state}>{state}</option>
@@ -236,16 +236,16 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
                       <label className="text-sm font-medium text-gray-700 mb-1">
                         Pincode *
                       </label>
-                      <input
-                        type="text"
-                        name="pincode"
-                        value={customerDetails.pincode}
-                        onChange={handleChange}
-                        className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 ${
-                          errors.pincode ? 'border-red-500' : 'border-gray-300'
-                        }`}
-                        placeholder="6-digit pincode"
-                      />
+                                              <input
+                          type="text"
+                          name="pincode"
+                          value={customerDetails.pincode}
+                          onChange={handleChange}
+                          className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-600 ${
+                            errors.pincode ? 'border-red-500' : 'border-gray-300'
+                          }`}
+                          placeholder="6-digit pincode"
+                        />
                       {errors.pincode && <p className="text-red-500 text-sm mt-1">{errors.pincode}</p>}
                     </div>
                   </div>
@@ -295,7 +295,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={handleSubmit}
-                  className="w-full mt-6 bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600 transition-colors shadow-lg"
+                  className="btn-primary w-full mt-6 shadow-lg"
                 >
                   Proceed to Payment
                 </motion.button>

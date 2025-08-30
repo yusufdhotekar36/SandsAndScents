@@ -154,6 +154,34 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
         throw itemsError;
       }
 
+      // Update perfume stock for each item
+      for (const item of cartItems) {
+        console.log('Decrementing stock for:', { perfume_id: item.id, type: typeof item.id, quantity: item.quantity });
+        const { error: stockError } = await supabase.rpc('decrement_perfume_stock', {
+          perfume_id: Number(item.id),
+          quantity: item.quantity
+        });
+        if (stockError) {
+          console.error('Stock update error:', stockError);
+          alert(JSON.stringify(stockError, null, 2));
+          showNotification('error', 'Stock Update Error', `Failed to update stock for ${item.name}: ${stockError.message}`);
+        }
+      }
+
+      // After updating stock for each item, check for low stock and notify
+      const LOW_STOCK_THRESHOLD = 5;
+      for (const item of cartItems) {
+        const { data, error } = await supabase
+          .from('perfumes')
+          .select('stock, name')
+          .eq('id', item.id)
+          .single();
+        if (!error && data.stock <= LOW_STOCK_THRESHOLD) {
+          showNotification('warning', 'Low Stock', `${data.name} is running low! Only ${data.stock} left.`);
+          // Optionally, trigger backend/email/WhatsApp notification here
+        }
+      }
+
       console.log('Order items saved successfully');
       return orderResult;
     } catch (error) {
@@ -162,10 +190,37 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
     }
   };
 
+  // Helper to check stock before checkout
+  const checkStockBeforeCheckout = async () => {
+    for (const item of cartItems) {
+      const { data, error } = await supabase
+        .from('perfumes')
+        .select('stock, name')
+        .eq('id', item.id)
+        .single();
+      if (error) {
+        showNotification('error', 'Stock Check Error', `Could not check stock for ${item.name}`);
+        return false;
+      }
+      if (data.stock < item.quantity) {
+        showNotification('error', 'Insufficient Stock', `Only ${data.stock} left for ${item.name}`);
+        return false;
+      }
+    }
+    return true;
+  };
+
   const handleRazorpayPayment = async () => {
     setLoading(true);
     
     try {
+      // Prevent checkout if stock is insufficient
+      const canCheckout = await checkStockBeforeCheckout();
+      if (!canCheckout) {
+        setLoading(false);
+        return;
+      }
+
       // Generate order data
       const orderId = generateOrderId();
       const orderData = {

@@ -156,7 +156,7 @@ const UserAuthModal: React.FC<UserAuthModalProps> = ({ isOpen, onClose, mode, on
                           value={formData.fullName}
                           onChange={handleChange}
                           required
-                          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-600 focus:border-transparent transition-all"
                           placeholder="Enter your full name"
                         />
                       </div>
@@ -174,7 +174,7 @@ const UserAuthModal: React.FC<UserAuthModalProps> = ({ isOpen, onClose, mode, on
                           value={formData.phone}
                           onChange={handleChange}
                           required
-                          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-600 focus:border-transparent transition-all"
                           placeholder="Enter your phone number"
                         />
                       </div>
@@ -195,7 +195,7 @@ const UserAuthModal: React.FC<UserAuthModalProps> = ({ isOpen, onClose, mode, on
                         value={formData.email}
                         onChange={handleChange}
                         required
-                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-600 focus:border-transparent transition-all"
                         placeholder="Enter your email"
                       />
                     </div>
@@ -214,7 +214,7 @@ const UserAuthModal: React.FC<UserAuthModalProps> = ({ isOpen, onClose, mode, on
                       value={formData.password}
                       onChange={handleChange}
                       required
-                      className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                      className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-600 focus:border-transparent transition-all"
                       placeholder={mode === 'admin' ? 'Enter admin password' : 'Enter your password'}
                     />
                     <button
@@ -232,7 +232,7 @@ const UserAuthModal: React.FC<UserAuthModalProps> = ({ isOpen, onClose, mode, on
                   whileTap={{ scale: 0.98 }}
                   type="submit"
                   disabled={loading}
-                  className="btn-primary w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white py-3 rounded-lg font-medium hover:from-orange-600 hover:to-orange-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+                  className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
                 >
                   {loading ? (
                     <div className="flex items-center justify-center">
@@ -251,7 +251,7 @@ const UserAuthModal: React.FC<UserAuthModalProps> = ({ isOpen, onClose, mode, on
                   {mode === 'login' ? "Don't have an account? " : mode === 'signup' ? "Already have an account? " : "Back to "}
                   <button
                     onClick={() => onModeChange(mode === 'login' ? 'signup' : mode === 'signup' ? 'login' : 'login')}
-                    className="text-orange-600 hover:text-orange-700 font-medium transition-colors"
+                    className="text-slate-600 hover:text-slate-700 font-medium transition-colors"
                   >
                     {mode === 'login' ? 'Sign Up' : mode === 'signup' ? 'Sign In' : 'Sign In'}
                   </button>
