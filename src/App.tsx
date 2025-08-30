@@ -1,19 +1,10 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Toaster } from 'react-hot-toast';
+import { RouterProvider } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
-import Navbar from './components/Navbar';
-import LogoSidePanel from './components/LogoSidePanel';
-import FloatingWhatsAppQR from './components/FloatingWhatsAppQR';
+import { NotificationProvider } from './contexts/NotificationContext';
+import { router } from './routes';
+import UserAuthModal from './components/UserAuthModal';
 import CheckoutModal from './components/CheckoutModal';
-import Home from './pages/Home';
-import Products from './pages/Products';
-import AdminLogin from './pages/AdminLogin';
-import AdminDashboard from './pages/AdminDashboard';
-import FloatingElements from './components/FloatingElements';
-import PrivacyPolicy from './pages/PrivacyPolicy'; // ✅ Added this line
-import Footer from './components/Footer';
-
 
 interface CartItem {
   id: string;
@@ -27,9 +18,12 @@ function App() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [showCheckout, setShowCheckout] = useState(false);
 
+  // ✅ State for Login/Signup modal
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [authMode, setAuthMode] = useState<'login' | 'signup' | 'admin'>('login');
+
   const addToCart = (perfume: any, quantity: number = 1) => {
     const existingItem = cartItems.find(item => item.id === perfume.id);
-    
     if (existingItem) {
       setCartItems(items =>
         items.map(item =>
@@ -54,14 +48,16 @@ function App() {
 
   const updateCartQuantity = (id: string, quantity: number) => {
     setCartItems(items =>
-      items.map(item =>
-        item.id === id ? { ...item, quantity } : item
-      )
+      items.map(item => (item.id === id ? { ...item, quantity } : item))
     );
   };
 
   const removeFromCart = (id: string) => {
     setCartItems(items => items.filter(item => item.id !== id));
+  };
+
+  const handleCheckout = () => {
+    setShowCheckout(true);
   };
 
   const handleOrderComplete = () => {
@@ -71,48 +67,39 @@ function App() {
 
   return (
     <AuthProvider>
-      <Router>
-        <div className="min-h-screen bg-gray-50">
-          <FloatingElements />
-          <LogoSidePanel />
-          <Navbar 
-            cartItems={cartItems}
-            onUpdateCartQuantity={updateCartQuantity}
-            onRemoveFromCart={removeFromCart}
-            onCheckout={() => setShowCheckout(true)}
-          />
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route 
-              path="/products" 
-              element={<Products onAddToCart={addToCart} />} 
-            />
-            <Route path="/admin/login" element={<AdminLogin />} />
-            <Route path="/admin/dashboard" element={<AdminDashboard />} />
-            <Route path="/privacy-policy" element={<PrivacyPolicy />} /> {/* ✅ New route */}
-          </Routes>
-          <FloatingWhatsAppQR />
-          
-          <CheckoutModal
-            isOpen={showCheckout}
-            onClose={() => setShowCheckout(false)}
-            cartItems={cartItems}
-            onOrderComplete={handleOrderComplete}
-          />
-          <Footer />  {/* ✅ This will add Privacy Policy link at the bottom */}
-          <Toaster 
-            position="top-right"
-            toastOptions={{
-              duration: 4000,
-              style: {
-                background: 'rgba(255, 255, 255, 0.9)',
-                backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(255, 255, 255, 0.3)',
-              },
-            }}
-          />
-        </div>
-      </Router>
+      <NotificationProvider>
+      <RouterProvider
+        router={router({
+          cartItems,
+          onUpdateCartQuantity: updateCartQuantity,
+          onRemoveFromCart: removeFromCart,
+          onCheckout: handleCheckout,
+          onAddToCart: addToCart,
+          // ✅ This triggers the modal from Navbar
+          onLoginClick: () => {
+            setAuthMode('login');
+            setAuthModalOpen(true);
+          },
+        })}
+      />
+
+      {/* ✅ Login / Signup Modal */}
+      <UserAuthModal
+        isOpen={authModalOpen}
+        onClose={() => setAuthModalOpen(false)}
+        mode={authMode}
+        onModeChange={setAuthMode}
+      />
+
+      {showCheckout && (
+        <CheckoutModal
+          isOpen={showCheckout}
+          onClose={() => setShowCheckout(false)}
+          cartItems={cartItems}
+          onOrderComplete={handleOrderComplete}
+        />
+      )}
+      </NotificationProvider>
     </AuthProvider>
   );
 }

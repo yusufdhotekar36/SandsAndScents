@@ -1,14 +1,21 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Star, Crown, Leaf, User } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
-interface CategoriesModalProps {
+interface ShopByBrandsModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-const CategoriesModal: React.FC<CategoriesModalProps> = ({ isOpen, onClose }) => {
+const ShopByBrandsModal: React.FC<ShopByBrandsModalProps> = ({ isOpen, onClose }) => {
   const [selectedGender, setSelectedGender] = useState<string | null>(null);
+  const navigate = useNavigate(); // ✅ useNavigate hook
+
+  const handleBrandClick = (brandName: string) => {
+    navigate(`/products?brand=${encodeURIComponent(brandName)}`);
+    onClose(); // ✅ close modal after navigating
+  };
 
   const genderCategories = [
     {
@@ -46,15 +53,16 @@ const CategoriesModal: React.FC<CategoriesModalProps> = ({ isOpen, onClose }) =>
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-2 sm:p-4">
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
+            initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            className="bg-white rounded-2xl p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto"
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto p-4 sm:p-6"
           >
+            {/* Modal Header */}
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-3xl font-bold text-gray-800">Perfume Categories</h2>
+              <h2 className="text-xl sm:text-3xl font-bold text-gray-800">Shop by Brands</h2>
               <button
                 onClick={onClose}
                 className="text-gray-500 hover:text-gray-700 transition-colors"
@@ -63,39 +71,44 @@ const CategoriesModal: React.FC<CategoriesModalProps> = ({ isOpen, onClose }) =>
               </button>
             </div>
 
+            {/* Category View */}
             {!selectedGender ? (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                 {genderCategories.map((category) => (
                   <motion.button
                     key={category.id}
                     whileHover={{ scale: 1.02, y: -5 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => setSelectedGender(category.id)}
-                    className={`p-8 rounded-2xl bg-gradient-to-br ${category.gradient} text-white text-center hover:shadow-xl transition-all duration-300 transform`}
+                    className={`p-6 sm:p-8 rounded-2xl bg-gradient-to-br ${category.gradient} text-white text-center hover:shadow-xl transition-all duration-300`}
                   >
                     <div className="flex justify-center mb-4">
                       {category.icon}
                     </div>
-                    <h3 className="text-2xl font-bold mb-2">{category.title}</h3>
-                    <p className="text-white/80">Explore {category.title.toLowerCase()} fragrances</p>
+                    <h3 className="text-xl sm:text-2xl font-bold mb-2">{category.title}</h3>
+                    <p className="text-white/80 text-sm sm:text-base">
+                      Explore {category.title.toLowerCase()} fragrances
+                    </p>
                   </motion.button>
                 ))}
               </div>
             ) : (
               <div>
-                <div className="flex items-center mb-6">
+                {/* Back & Header */}
+                <div className="flex items-center flex-wrap gap-3 mb-6">
                   <button
                     onClick={() => setSelectedGender(null)}
-                    className="text-orange-600 hover:text-orange-700 mr-4 font-medium"
+                    className="text-orange-600 hover:text-orange-700 font-medium"
                   >
                     ← Back
                   </button>
-                  <h3 className="text-2xl font-bold text-gray-800">
+                  <h3 className="text-xl sm:text-2xl font-bold text-gray-800">
                     {genderCategories.find(c => c.id === selectedGender)?.title} Brands
                   </h3>
                 </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                {/* Brand List */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
                   {genderCategories
                     .find(c => c.id === selectedGender)
                     ?.brands.map((brand, index) => (
@@ -103,12 +116,13 @@ const CategoriesModal: React.FC<CategoriesModalProps> = ({ isOpen, onClose }) =>
                         key={brand}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.05 }}
+                        transition={{ delay: index * 0.04 }}
                         whileHover={{ scale: 1.02, y: -2 }}
                         whileTap={{ scale: 0.98 }}
-                        className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 hover:shadow-md transition-all duration-200 text-center border border-gray-200"
+                        onClick={() => handleBrandClick(brand)} // ✅ trigger navigation
+                        className="p-3 sm:p-4 bg-gray-50 rounded-lg hover:bg-gray-100 hover:shadow-md transition-all duration-200 text-center border border-gray-200"
                       >
-                        <span className="font-medium text-gray-800">{brand}</span>
+                        <span className="text-sm sm:text-base font-medium text-gray-800">{brand}</span>
                       </motion.button>
                     ))}
                 </div>
@@ -121,4 +135,4 @@ const CategoriesModal: React.FC<CategoriesModalProps> = ({ isOpen, onClose }) =>
   );
 };
 
-export default CategoriesModal;
+export default ShopByBrandsModal;

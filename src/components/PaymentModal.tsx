@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, CreditCard, Smartphone, QrCode, CheckCircle, Copy } from 'lucide-react';
+import { X, CreditCard, Smartphone, QrCode, CheckCircle, Copy, Check, AlertCircle, Phone, Mail } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import ThankYouModal from './ThankYouModal';
-import toast from 'react-hot-toast';
+import { useNotification } from '../contexts/NotificationContext';
 
 interface CartItem {
   id: string;
@@ -40,11 +40,15 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
   total,
   onOrderComplete
 }) => {
-  const [paymentMethod, setPaymentMethod] = useState<'upi' | 'bank'>('upi');
+  const { showNotification } = useNotification();
+  const [selectedMethod, setSelectedMethod] = useState<'upi' | 'bank' | 'cod'>('upi');
   const [transactionId, setTransactionId] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [showThankYou, setShowThankYou] = useState(false);
   const [orderId, setOrderId] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [savedOrderId, setSavedOrderId] = useState('');
+  const [savedCustomerName, setSavedCustomerName] = useState('');
+  const [savedCustomerPhone, setSavedCustomerPhone] = useState('');
 
   const upiId = 'sandsandscents@paytm';
   const bankDetails = {
@@ -54,9 +58,13 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
     bankName: 'HDFC Bank'
   };
 
-  const copyToClipboard = (text: string, label: string) => {
-    navigator.clipboard.writeText(text);
-    toast.success(`${label} copied to clipboard!`);
+  const copyToClipboard = async (text: string, label: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      showNotification('success', 'Copied!', `${label} copied to clipboard!`);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
   };
 
   const generateOrderId = () => {
@@ -90,7 +98,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
     } catch (error) {
       console.error('Error sending WhatsApp message:', error);
       // Don't throw error here as order is already placed
-      toast.error('Order placed but WhatsApp notification failed');
+      showNotification('error', 'Order Error', 'Order placed but WhatsApp notification failed');
       return null;
     }
   };
@@ -112,7 +120,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
           state: orderData.state,
           pincode: orderData.pincode,
           total_amount: orderData.totalAmount,
-          payment_method: paymentMethod,
+          payment_method: selectedMethod,
           transaction_id: orderData.transactionId,
           status: 'confirmed'
         }])
@@ -154,65 +162,80 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
     }
   };
 
-  const handleSubmitPayment = async () => {
-    if (!transactionId.trim()) {
-      toast.error('Please enter transaction ID');
-      return;
-    }
-
-    setIsSubmitting(true);
+  const handleRazorpayPayment = async () => {
+    setLoading(true);
     
     try {
-      const newOrderId = generateOrderId();
-      console.log('Processing order with ID:', newOrderId);
-      
+      // Generate order data
+      const orderId = generateOrderId();
       const orderData = {
-        orderId: newOrderId,
+        orderId,
         customerName: customerDetails.fullName,
         customerPhone: customerDetails.phone,
         customerEmail: customerDetails.email,
-        items: cartItems.map(item => ({
-          name: item.name,
-          quantity: item.quantity,
-          price: item.price
-        })),
-        totalAmount: total,
         shippingAddress: customerDetails.address,
         city: customerDetails.city,
         state: customerDetails.state,
         pincode: customerDetails.pincode,
-        transactionId: transactionId.trim()
+        totalAmount: total,
+        transactionId: '', // Will be updated after payment
+        cartItems
       };
 
-      console.log('Order data prepared:', orderData);
-
-      // Save order to database first
-      await saveOrderToDatabase(orderData);
-      console.log('Order saved to database successfully');
-
-      // Send WhatsApp message (non-blocking)
-      sendWhatsAppMessage(orderData);
-
-      setOrderId(newOrderId);
-      setShowThankYou(true);
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+        amount: total * 100, // Amount in paise
+        currency: 'INR',
+        name: 'Sands & Scents',
+        description: `Order ${orderId}`,
+        image: '/logo.jpeg',
+        handler: async function (response: any) {
+          try {
+            // Update order data with payment details
+            orderData.transactionId = response.razorpay_payment_id;
+            
+            // Save order to database
+            const savedOrder = await saveOrderToDatabase(orderData);
+            
+            // Set order details for thank you modal
+            setSavedOrderId(orderData.orderId);
+            setSavedCustomerName(orderData.customerName);
+            setSavedCustomerPhone(orderData.customerPhone);
+            
+            // Send WhatsApp notification
+            await sendWhatsAppMessage(orderData);
+            
+            // Show success notification and thank you modal
+            showNotification('success', 'Payment Successful', 'Your order has been placed successfully!');
+            setShowThankYou(true);
+            onOrderComplete();
+          } catch (error) {
+            console.error('Error processing successful payment:', error);
+            showNotification('error', 'Order Error', 'Payment successful but order processing failed. Please contact support.');
+          }
+        },
+        prefill: {
+          name: customerDetails.fullName,
+          email: customerDetails.email,
+          contact: customerDetails.phone,
+        },
+        theme: {
+          color: '#ea580c',
+        },
+        modal: {
+          ondismiss: function() {
+            setLoading(false);
+          }
+        }
+      };
       
-      toast.success('Order placed successfully!');
-      onOrderComplete();
+      // @ts-ignore
+      const rzp = new window.Razorpay(options);
+      rzp.open();
     } catch (error) {
-      console.error('Error processing order:', error);
-      
-      // More specific error messages
-      if (error.message?.includes('duplicate key')) {
-        toast.error('Order ID already exists. Please try again.');
-      } else if (error.message?.includes('network')) {
-        toast.error('Network error. Please check your connection and try again.');
-      } else if (error.message?.includes('permission')) {
-        toast.error('Permission denied. Please contact support.');
-      } else {
-        toast.error(`Failed to process order: ${error.message || 'Unknown error'}`);
-      }
-    } finally {
-      setIsSubmitting(false);
+      console.error('Error initiating payment:', error);
+      showNotification('error', 'Payment Error', 'Failed to initiate payment. Please try again.');
+      setLoading(false);
     }
   };
 
@@ -230,7 +253,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
-              className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+              className="bg-gradient-to-br from-orange-50 to-yellow-50 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
             >
               <div className="flex justify-between items-center p-6 border-b">
                 <h2 className="text-2xl font-semibold text-gray-800 flex items-center">
@@ -244,186 +267,45 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
                   <X className="h-6 w-6" />
                 </button>
               </div>
-
-              <div className="p-6">
-                {/* Payment Amount */}
-                <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-6">
-                  <div className="text-center">
-                    <p className="text-gray-600 mb-2">Total Amount to Pay</p>
-                    <p className="text-3xl font-bold text-orange-600">₹{total.toFixed(2)}</p>
+              {/* Cart Summary and User Details */}
+              <div className="p-6 space-y-6">
+                <div className="bg-white/80 rounded-xl p-4 mb-4">
+                  <h3 className="text-lg font-semibold mb-2 text-gray-900">Order Summary</h3>
+                  <ul className="divide-y divide-gray-200 mb-2">
+                    {cartItems.map(item => (
+                      <li key={item.id} className="flex justify-between py-2 text-gray-800">
+                        <span>{item.name} x {item.quantity}</span>
+                        <span>₹{item.price * item.quantity}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="flex justify-between font-bold text-lg text-gray-900">
+                    <span>Total</span>
+                    <span>₹{total}</span>
                   </div>
                 </div>
-
-                {/* Payment Method Selection */}
-                <div className="mb-6">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Select Payment Method</h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    <button
-                      onClick={() => setPaymentMethod('upi')}
-                      className={`p-4 border-2 rounded-lg transition-all ${
-                        paymentMethod === 'upi'
-                          ? 'border-orange-500 bg-orange-50'
-                          : 'border-gray-300 hover:border-gray-400'
-                      }`}
-                    >
-                      <Smartphone className="h-8 w-8 mx-auto mb-2 text-orange-500" />
-                      <p className="font-medium">UPI Payment</p>
-                    </button>
-                    
-                    <button
-                      onClick={() => setPaymentMethod('bank')}
-                      className={`p-4 border-2 rounded-lg transition-all ${
-                        paymentMethod === 'bank'
-                          ? 'border-orange-500 bg-orange-50'
-                          : 'border-gray-300 hover:border-gray-400'
-                      }`}
-                    >
-                      <CreditCard className="h-8 w-8 mx-auto mb-2 text-orange-500" />
-                      <p className="font-medium">Bank Transfer</p>
-                    </button>
+                <div className="bg-white/80 rounded-xl p-4">
+                  <h3 className="text-lg font-semibold mb-2 text-gray-900">Shipping Details</h3>
+                  <div className="text-gray-800">
+                    <div><span className="font-medium">Name:</span> {customerDetails.fullName}</div>
+                    <div><span className="font-medium">Phone:</span> {customerDetails.phone}</div>
+                    <div><span className="font-medium">Email:</span> {customerDetails.email}</div>
+                    <div><span className="font-medium">Address:</span> {customerDetails.address}, {customerDetails.city}, {customerDetails.state} - {customerDetails.pincode}</div>
                   </div>
                 </div>
-
-                {/* Payment Details */}
-                <div className="mb-6">
-                  {paymentMethod === 'upi' ? (
-                    <div className="bg-gray-50 rounded-lg p-4">
-                      <h4 className="font-semibold text-gray-800 mb-3 flex items-center">
-                        <QrCode className="h-5 w-5 mr-2" />
-                        UPI Payment Details
-                      </h4>
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between bg-white p-3 rounded border">
-                          <span className="text-gray-600">UPI ID:</span>
-                          <div className="flex items-center space-x-2">
-                            <span className="font-mono font-medium">{upiId}</span>
-                            <button
-                              onClick={() => copyToClipboard(upiId, 'UPI ID')}
-                              className="text-orange-500 hover:text-orange-600"
-                            >
-                              <Copy className="h-4 w-4" />
-                            </button>
-                          </div>
-                        </div>
-                        <div className="flex items-center justify-between bg-white p-3 rounded border">
-                          <span className="text-gray-600">Amount:</span>
-                          <span className="font-bold text-orange-600">₹{total.toFixed(2)}</span>
-                        </div>
-                      </div>
-                      <p className="text-sm text-gray-600 mt-3">
-                        💡 Pay using any UPI app (PhonePe, Google Pay, Paytm, etc.)
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="bg-gray-50 rounded-lg p-4">
-                      <h4 className="font-semibold text-gray-800 mb-3 flex items-center">
-                        <CreditCard className="h-5 w-5 mr-2" />
-                        Bank Transfer Details
-                      </h4>
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between bg-white p-3 rounded border">
-                          <span className="text-gray-600">Account Name:</span>
-                          <div className="flex items-center space-x-2">
-                            <span className="font-medium">{bankDetails.accountName}</span>
-                            <button
-                              onClick={() => copyToClipboard(bankDetails.accountName, 'Account Name')}
-                              className="text-orange-500 hover:text-orange-600"
-                            >
-                              <Copy className="h-4 w-4" />
-                            </button>
-                          </div>
-                        </div>
-                        <div className="flex items-center justify-between bg-white p-3 rounded border">
-                          <span className="text-gray-600">Account Number:</span>
-                          <div className="flex items-center space-x-2">
-                            <span className="font-mono font-medium">{bankDetails.accountNumber}</span>
-                            <button
-                              onClick={() => copyToClipboard(bankDetails.accountNumber, 'Account Number')}
-                              className="text-orange-500 hover:text-orange-600"
-                            >
-                              <Copy className="h-4 w-4" />
-                            </button>
-                          </div>
-                        </div>
-                        <div className="flex items-center justify-between bg-white p-3 rounded border">
-                          <span className="text-gray-600">IFSC Code:</span>
-                          <div className="flex items-center space-x-2">
-                            <span className="font-mono font-medium">{bankDetails.ifsc}</span>
-                            <button
-                              onClick={() => copyToClipboard(bankDetails.ifsc, 'IFSC Code')}
-                              className="text-orange-500 hover:text-orange-600"
-                            >
-                              <Copy className="h-4 w-4" />
-                            </button>
-                          </div>
-                        </div>
-                        <div className="flex items-center justify-between bg-white p-3 rounded border">
-                          <span className="text-gray-600">Bank Name:</span>
-                          <span className="font-medium">{bankDetails.bankName}</span>
-                        </div>
-                        <div className="flex items-center justify-between bg-white p-3 rounded border">
-                          <span className="text-gray-600">Amount:</span>
-                          <span className="font-bold text-orange-600">₹{total.toFixed(2)}</span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Transaction ID Input */}
-                <div className="mb-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Transaction ID / UTR Number *
-                  </label>
-                  <input
-                    type="text"
-                    value={transactionId}
-                    onChange={(e) => setTransactionId(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                    placeholder="Enter transaction ID after payment"
-                  />
-                  <p className="text-sm text-gray-600 mt-1">
-                    Enter the transaction ID you received after making the payment
-                  </p>
-                </div>
-
-                {/* Submit Button */}
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={handleSubmitPayment}
-                  disabled={isSubmitting || !transactionId.trim()}
-                  className="w-full bg-green-500 text-white py-3 rounded-lg font-semibold hover:bg-green-600 transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                <button
+                  onClick={handleRazorpayPayment}
+                  className="btn-primary w-full text-lg font-semibold mt-4"
                 >
-                  {isSubmitting ? (
-                    <>
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                      Processing Order...
-                    </>
-                  ) : (
-                    <>
-                      <CheckCircle className="h-5 w-5 mr-2" />
-                      Confirm Payment & Place Order
-                    </>
-                  )}
-                </motion.button>
-
-                <p className="text-xs text-gray-500 text-center mt-4">
-                  🔒 Your payment information is secure. Order confirmation will be sent via WhatsApp.
-                </p>
+                  Pay Now
+                </button>
               </div>
             </motion.div>
           </div>
         )}
       </AnimatePresence>
-
-      <ThankYouModal
-        isOpen={showThankYou}
-        onClose={handleThankYouClose}
-        orderId={orderId}
-        customerName={customerDetails.fullName}
-        customerPhone={customerDetails.phone}
-      />
+      {/* Thank You Modal */}
+      <ThankYouModal isOpen={showThankYou} onClose={handleThankYouClose} orderId={savedOrderId} customerName={savedCustomerName} customerPhone={savedCustomerPhone} />
     </>
   );
 };

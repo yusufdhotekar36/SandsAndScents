@@ -120,7 +120,7 @@ const LogoSidePanel = () => {
                           className="inline-block p-2 bg-white rounded-lg"
                         >
                           <img
-                            src="dist/QR.png"
+                            src="/QR.jpeg"
                             alt="WhatsApp QR Code"
                             className="w-40 h-40 object-cover rounded"
                           />

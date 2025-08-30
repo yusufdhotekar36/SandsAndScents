@@ -124,7 +124,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="text-sm font-medium text-gray-700 mb-1">
                       Full Name *
                     </label>
                     <input
@@ -142,7 +142,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="text-sm font-medium text-gray-700 mb-1">
                         Phone Number *
                       </label>
                       <input
@@ -159,7 +159,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="text-sm font-medium text-gray-700 mb-1">
                         Email Address *
                       </label>
                       <input
@@ -177,7 +177,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                    <label className="text-sm font-medium text-gray-700 mb-1 flex items-center">
                       <MapPin className="h-4 w-4 mr-1" />
                       Address *
                     </label>
@@ -196,7 +196,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="text-sm font-medium text-gray-700 mb-1">
                         City *
                       </label>
                       <input
@@ -213,7 +213,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="text-sm font-medium text-gray-700 mb-1">
                         State *
                       </label>
                       <select
@@ -233,7 +233,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="text-sm font-medium text-gray-700 mb-1">
                         Pincode *
                       </label>
                       <input

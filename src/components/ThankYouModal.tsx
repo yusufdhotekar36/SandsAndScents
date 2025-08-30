@@ -106,7 +106,7 @@ const ThankYouModal: React.FC<ThankYouModalProps> = ({
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={onClose}
-                className="w-full mt-6 bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600 transition-colors"
+                className="btn-primary w-full mt-6 bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600 transition-colors"
               >
                 Continue Shopping
               </motion.button>
