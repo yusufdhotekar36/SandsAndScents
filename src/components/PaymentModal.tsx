@@ -214,6 +214,14 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
     setLoading(true);
     
     try {
+      // Debug: Check if environment variable is loaded
+      console.log('Razorpay Key:', import.meta.env.VITE_RAZORPAY_KEY_ID);
+      console.log('All env vars:', import.meta.env);
+      
+      if (!import.meta.env.VITE_RAZORPAY_KEY_ID) {
+        throw new Error('Razorpay key is not defined in environment variables');
+      }
+
       // Prevent checkout if stock is insufficient
       const canCheckout = await checkStockBeforeCheckout();
       if (!canCheckout) {
